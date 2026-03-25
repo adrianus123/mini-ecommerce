@@ -1,0 +1,6 @@
+auth-service/.env
+gateway-service/.env
+inventory-service/.env
+order-service/.env
+payment-service/.env
+product-service/.env
