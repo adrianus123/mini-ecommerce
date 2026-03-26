@@ -12,12 +12,14 @@ type EventUsecase interface {
 }
 
 type eventUsecase struct {
-	repo repository.EventRepository
+	repo              repository.EventRepository
+	productRepository repository.ProductRepository
 }
 
-func NewEventUseCase(repo repository.EventRepository) *eventUsecase {
+func NewEventUseCase(repo repository.EventRepository, productRepository repository.ProductRepository) *eventUsecase {
 	return &eventUsecase{
-		repo: repo,
+		repo:              repo,
+		productRepository: productRepository,
 	}
 }
 
@@ -32,5 +34,29 @@ func (u *eventUsecase) ProcessEvent(ctx context.Context, data []byte) error {
 		return nil
 	}
 
-	return u.repo.Save(ctx, event)
+	var productIds []uint
+	substractItem := map[uint]uint{}
+
+	for _, e := range event.Value {
+		productIds = append(productIds, e.ProductID)
+		substractItem[e.ProductID] = e.Qty
+	}
+
+	products, err := u.productRepository.GetProductByIdIn(productIds)
+	if err != nil {
+		return err
+	}
+
+	var updatedProducts []entity.Product
+	for _, product := range products {
+		product.Qty -= substractItem[product.ID]
+		updatedProducts = append(updatedProducts, product)
+	}
+
+	err = u.productRepository.SaveProducts(updatedProducts)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

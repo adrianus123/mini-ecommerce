@@ -4,18 +4,12 @@ import (
 	"context"
 	"inventory-service/internal/entity"
 	"log"
-
-	"gorm.io/gorm"
 )
 
-type eventRepository struct {
-	db *gorm.DB
-}
+type eventRepository struct{}
 
-func NewEventRepository(db *gorm.DB) EventRepository {
-	return &eventRepository{
-		db: db,
-	}
+func NewEventRepository() EventRepository {
+	return &eventRepository{}
 }
 
 func (r *eventRepository) Save(ctx context.Context, event entity.Event) error {

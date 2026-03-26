@@ -24,8 +24,9 @@ func main() {
 	// }
 
 	ctx := context.Background()
-	eventRepo := repository.NewEventRepository(db)
-	usecase := usecase.NewEventUseCase(eventRepo)
+	eventRepo := repository.NewEventRepository()
+	productRepo := repository.NewProductRepository(db)
+	usecase := usecase.NewEventUseCase(eventRepo, productRepo)
 
 	consumer := kafka.NewConsumer(
 		[]string{"localhost:9092"},
